@@ -1,0 +1,29 @@
+version: '3'
+services:
+  jms-publisher-service:
+    build: ./jms-publisher
+    image: sovleit/jms-publisher-service-img
+    environment:
+      - solace.host=tcp://host.docker.internal:55555
+      - solace.vpnName=default
+      - solace.userName=admin
+      - solace.pwd=admin
+      - solace.topic=solveit/inventory
+    ports:
+      - 8088:8088
+    container_name: jms-publisher-service
+  jms-subscriber-service:
+    build: ./jms-subscriber
+    image: sovleit/jms-subscriber-service-img
+    environment:
+      - solace.host=tcp://host.docker.internal:55555
+      - solace.vpnName=default
+      - solace.userName=admin
+      - solace.pwd=admin
+      - solace.topic=solveit/inventory
+    ports:
+      - 8089:8089
+    depends_on:
+      jms-publisher-service:
+        condition: service_started
+    container_name: jms-subscriber-service
