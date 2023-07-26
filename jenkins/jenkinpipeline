@@ -1,0 +1,43 @@
+pipeline {
+
+agent {
+ label 'newDocker1'
+    
+}
+ 
+{
+    stage('Clone Git Repository')
+    {
+       
+                git "https://github.com/amreddy28/jenkins.git"
+                   
+            
+    }
+    stage('build') 
+    {
+        sh 'export PATH="/usr/lib/jvm/java-17-openjdk-amd64/bin:$PATH" && mvn package'
+
+    }
+    stages {
+	stage("build and push jms-publisher") {
+            steps {
+                dir('/usr/lib/jvm/workspace/jms1/java-examples-main/jms-publisher') {
+                	sh "mvn clean package"
+                	sh "docker build -t java-examples-main/jms-publisher-service-app:01 ."
+                	
+                	}
+		}
+            }
+        
+	stage("build and push jms-subscriber") {
+            steps {
+                dir('/usr/lib/jvm/workspace/jms1/java-examples-main/jms-subscriber') {
+                	sh "mvn clean package"
+                	sh "docker build -t java-examples-main/jms-subscriber-service-app:01 ."
+                	
+                	}
+		}
+            }
+        }
+}
+}
